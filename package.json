@@ -1,0 +1,38 @@
+{
+  "name": "nosql-eval",
+  "version": "1.0.0",
+  "description": "Evaluation of NoSQL databases; DynamoDB, MongoDB, ZHT using AWS Services",
+  "main": "app.js",
+  "dependencies": {
+    "aws-sdk": "^2.0.27",
+    "node-uuid": "^1.4.1",
+    "optimist": "^0.6.1",
+    "q": "^1.1.1",
+    "shelljs": "^0.5.3",
+    "socket.io": "^1.2.0",
+    "socket.io-client": "^1.2.0",
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theTechie/nosql-eval.git"
+  },
+  "keywords": [
+    "AWS",
+    "NoSQL",
+    "DynamoDB",
+    "ZHT",
+    "MongoDB",
+    "Node.js"
+  ],
+  "author": "theTechie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theTechie/nosql-eval/issues"
+  },
+  "homepage": "https://github.com/theTechie/nosql-eval"
+}
