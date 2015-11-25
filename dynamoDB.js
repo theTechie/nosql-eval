@@ -4,8 +4,12 @@ var helper = require('./helper'),
 var DynamoDB = new helper.AWS.DynamoDB(),
     TABLE_NAME = 'CS550';
 
+function init(callback) {
+  return createTable(callback);
+}
+
 // NOTE: create table
-exports.createTable = function (tableName, callback) {
+function createTable(callback) {
     var deferred = Q.defer();
 
     var params = {
@@ -24,33 +28,36 @@ exports.createTable = function (tableName, callback) {
             }
         ],
         ProvisionedThroughput: { /* required */
-            ReadCapacityUnits: 1,
+            ReadCapacityUnits: 20,
             /* required */
-            WriteCapacityUnits: 1 /* required */
+            WriteCapacityUnits: 20 /* required */
         },
-        TableName: tableName || TABLE_NAME,
+        TableName: TABLE_NAME,
         /* required */
     };
 
     DynamoDB.createTable(params, function (err, data) {
-        if (err) deferred.reject("createTable() : " + err + err.stack);
-        else deferred.resolve(data);
+      if (err && err.code != 'ResourceInUseException') {
+        deferred.reject("createTable() : " + err + err.stack);
+      } else {
+        deferred.resolve(true);
+      }
     });
 
     return deferred.promise.nodeify(callback);
-};
+}
 
-// NOTE: Add item to table (key : taskId)
-exports.addItem = function (tableName, value, callback) {
+// NOTE: Add key-value to table (key : 'key')
+function putValue(key, value, callback) {
     var deferred = Q.defer();
 
     var params = {
         Item: { /* required */
-            key: {
-                S: value
+            'key': {
+              "S" : value.toString()
             }
         },
-        TableName: tableName || TABLE_NAME,
+        TableName: TABLE_NAME,
         /* required */
         Expected: {
             key: {
@@ -58,26 +65,24 @@ exports.addItem = function (tableName, value, callback) {
             }
         }
     };
-
+    
     DynamoDB.putItem(params, function (err, data) {
-        if (err) deferred.reject("putItem() : " + err + err.stack);
+        if (err) { console.log(err); deferred.reject("putItem() : " + err + err.stack); }
         else deferred.resolve(data);
     });
 
     return deferred.promise.nodeify(callback);
-};
+}
 
-// NOTE: Get item from table (key : taskId)
-exports.getItem = function (tableName, value, callback) {
+// NOTE: Get value from table (key : 'key')
+function getValue(key, callback) {
     var deferred = Q.defer();
 
     var params = {
         Key: { /* required */
-            key: {
-                S: value
-            }
+            key: key
         },
-        TableName: tableName || TABLE_NAME
+        TableName: TABLE_NAME
     };
 
     DynamoDB.getItem(params, function (err, data) {
@@ -86,4 +91,39 @@ exports.getItem = function (tableName, value, callback) {
     });
 
     return deferred.promise.nodeify(callback);
+}
+
+// NOTE: Get value from table (key : 'key')
+function deleteKey(key, callback) {
+    var deferred = Q.defer();
+
+    var params = {
+        Key: { /* required */
+            key: key
+        },
+        TableName: TABLE_NAME
+    };
+
+    DynamoDB.deleteItem(params, function (err, data) {
+        if (err) deferred.reject("deleteItem() : " + err + err.stack);
+        else deferred.resolve(data);
+    });
+
+    return deferred.promise.nodeify(callback);
+}
+
+function getSize(callback) {
+  var deferred = Q.defer();
+  
+  deferred.resolve("SIZE of MongoDB");
+  
+  return deferred.promise.nodeify(callback);
+}
+
+module.exports = {
+  init: init,
+  putValue: putValue,
+  getValue: getValue,
+  deleteKey: deleteKey,
+  getSize: getSize
 };
