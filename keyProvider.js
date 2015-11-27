@@ -1,23 +1,39 @@
-var Keys = [];
+var KVP = [],
+    keyLength = 10,
+    valueLength = 90;
 
 function init(startRange, numOfKeys) {
   var endRange = startRange + numOfKeys;
   
   for (var i = startRange; i < endRange; i++) {
-    Keys.push(i);
+    KVP.push({
+      key : makeString(keyLength),
+      value: makeString(valueLength)
+    });
   }
 }
 
-// NOTE: del = true; will return unique keys randomly
-function getKey(del) {
-  var index = Math.floor(Math.random() * Keys.length);
-  if (del) {
-    return Keys.splice(index, 1)[0];
-  }
-  return Keys[index];
+// NOTE: will return unique KVP randomly
+function getKey(index) {
+  return KVP[index].key;
+}
+
+function getValue(index) {
+  return KVP[index].value;
+}
+
+function makeString(length) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i = 0; i < length; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
 }
 
 module.exports = {
   init: init,
-  getKey: getKey
+  getKey: getKey,
+  getValue: getValue
 };

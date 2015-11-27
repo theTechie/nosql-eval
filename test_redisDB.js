@@ -63,8 +63,7 @@ function testPut(value) {
       startTime = Date.now();
   
     if (iteration < maxIteration) {
-        var key = KeyProvider.getKey(true);
-        performOperation(constants.TEST_PUT, key, key + '_value', testPut);
+        performOperation(constants.TEST_PUT, KeyProvider.getKey(iteration), KeyProvider.getValue(iteration), testPut);
         iteration++;
     } else {
         console.log("Total Put Latency / Lookup (ms) : ", totalLatency / maxIteration);
@@ -74,9 +73,6 @@ function testPut(value) {
           iteration = 0;
           totalLatency = 0;
           latency = 0;
-          
-          // NOTE: Prepare Keys
-          KeyProvider.init(argv.keyRange, argv.iterations);
           
           doTest(constants.TEST_GET);
         });
@@ -93,8 +89,7 @@ function testGet(value) {
       startTime = Date.now();
   
     if (iteration < maxIteration) {
-        var key = KeyProvider.getKey(true);
-        performOperation(constants.TEST_GET, key, key + '_value', testGet);
+        performOperation(constants.TEST_GET, KeyProvider.getKey(iteration), KeyProvider.getValue(iteration), testGet);
         iteration++;
     } else {
         console.log("Total Get Latency / Lookup (ms) : ", totalLatency / maxIteration);
@@ -104,9 +99,6 @@ function testGet(value) {
           iteration = 0;
           totalLatency = 0;
           latency = 0;
-          
-          // NOTE: Prepare Keys
-          KeyProvider.init(argv.keyRange, argv.iterations);
           
           doTest(constants.TEST_DELETE);
         });
@@ -123,8 +115,7 @@ function testDelete(value) {
       startTime = Date.now();
     
     if (iteration < maxIteration) {
-        var key = KeyProvider.getKey(true);
-        performOperation(constants.TEST_DELETE, key, key + '_value', testDelete);
+        performOperation(constants.TEST_DELETE, KeyProvider.getKey(iteration), KeyProvider.getValue(iteration), testDelete);
         iteration++;
     } else {
         console.log("Total Delete Latency / Lookup (ms) : ", totalLatency / maxIteration);
