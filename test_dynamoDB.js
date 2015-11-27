@@ -35,6 +35,7 @@ Store.init().then(function (status) {
   }
 }, function (err) {
   console.log(err);
+  process.exit();
 });
 
 function doTest(operation) {

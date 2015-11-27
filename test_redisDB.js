@@ -2,7 +2,7 @@
  * Created by gags on 11/14/15.
  */
 var constants = require('./constants'),
-    Store = require('./mongoDB'),
+    Store = require('./redisDB'),
     KeyProvider = require('./keyProvider');
 
 var logEnabled = false;
@@ -35,7 +35,6 @@ Store.init().then(function (status) {
   }
 }, function (err) {
   console.log(err);
-  process.exit();
 });
 
 function doTest(operation) {

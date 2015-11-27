@@ -1,24 +1,20 @@
 var Q = require('q'),
-    MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://172.17.0.2:27017/nosql-eval',
+    redis = require('redis'),
+    url = 'redis://172.17.0.2:6379',
     TABLE_NAME = 'CS550',
-    db_obj;
+    RedisClient;
 
 function init(callback) {
   var deferred = Q.defer();
   
-  MongoClient.connect(url, function(err, db) {
-    if (err) {
-      deferred.reject(err);
-    } else {
-      db_obj = db;
-      createTable().then(function (result) {
-        deferred.resolve(result);
-      }, function (err) {
-        deferred.reject(err);
-      });
-    }
+  RedisClient = redis.createClient(url);
+  
+  RedisClient.on('error', function (err) {
+    console.log("Error : ", err);
+    process.exit();
   });
+  
+  deferred.resolve(true);
   
   return deferred.promise.nodeify(callback);
 }
@@ -26,10 +22,7 @@ function init(callback) {
 function createTable(callback) {
   var deferred = Q.defer();
   
-  db_obj.createCollection(TABLE_NAME, function (err, result) {
-    if (err) deferred.reject(false);
-    else deferred.resolve(true);
-  });
+  deferred.resolve(true);
   
   return deferred.promise.nodeify(callback);
 }
@@ -38,10 +31,7 @@ function createTable(callback) {
 function putValue(key, value, callback) {
     var deferred = Q.defer();
 
-    db_obj.collection(TABLE_NAME).insertOne({
-      key: key,
-      value: value
-    }, function (err, result) {
+    RedisClient.set(key, value, function (err, result) {
       if (err) deferred.reject(false);
       else deferred.resolve(true);
     });
@@ -53,11 +43,9 @@ function putValue(key, value, callback) {
 function getValue(key, callback) {
     var deferred = Q.defer();
 
-    db_obj.collection(TABLE_NAME).find({
-      key: key
-    }, function (err, result) {
+    RedisClient.get(key, function (err, result) {
       if (err) deferred.reject(false);
-      else deferred.resolve(result);
+      else deferred.resolve(true);
     });
 
     return deferred.promise.nodeify(callback);
@@ -67,9 +55,7 @@ function getValue(key, callback) {
 function deleteKey(key, callback) {
     var deferred = Q.defer();
 
-    db_obj.collection(TABLE_NAME).deleteOne({
-      key: key
-    }, function (err, result) {
+    RedisClient.del(key, function (err, result) {
       if (err) deferred.reject(false);
       else deferred.resolve(true);
     });
@@ -80,16 +66,16 @@ function deleteKey(key, callback) {
 function getSize(callback) {
   var deferred = Q.defer();
   
-  db_obj.collection(TABLE_NAME).find().count(function (err, count) {
-      if (err) deferred.reject(false);
-      else deferred.resolve(count);
+  RedisClient.keys('*', function (err, result) {
+    if (err) deferred.reject(false);
+    else deferred.resolve(result.length);
   });
   
   return deferred.promise.nodeify(callback);
 }
 
 function teadDown() {
-  db_obj.close();
+  RedisClient.quit();
 }
 
 module.exports = {
