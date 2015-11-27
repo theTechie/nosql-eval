@@ -133,7 +133,7 @@ function testDelete(value) {
           console.log("Size after Delete: ", size);
           
           // NOTE: teardown
-          Store.teadDown();
+          //Store.tearDown();
           process.exit();
         });
 

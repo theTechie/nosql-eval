@@ -88,7 +88,7 @@ function getSize(callback) {
   return deferred.promise.nodeify(callback);
 }
 
-function teadDown() {
+function tearDown() {
   db_obj.close();
 }
 
@@ -98,5 +98,5 @@ module.exports = {
   getValue: getValue,
   deleteKey: deleteKey,
   getSize: getSize,
-  teadDown: teadDown
+  tearDown: tearDown
 };

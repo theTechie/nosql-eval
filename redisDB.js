@@ -74,7 +74,7 @@ function getSize(callback) {
   return deferred.promise.nodeify(callback);
 }
 
-function teadDown() {
+function tearDown() {
   RedisClient.quit();
 }
 
@@ -84,5 +84,5 @@ module.exports = {
   getValue: getValue,
   deleteKey: deleteKey,
   getSize: getSize,
-  teadDown: teadDown
+  tearDown: tearDown
 };
