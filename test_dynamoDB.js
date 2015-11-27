@@ -1,38 +1,41 @@
 /**
  * Created by gags on 11/14/15.
  */
-var constants = require('./constants');
+var constants = require('./constants'),
+    Store = require('./dynamoDB'),
+    KeyProvider = require('./keyProvider');
 
-var log = false;
+var logEnabled = false;
 
 var argv = require('optimist')
     .usage('Usage: $0 -k [KEY_RANGE]')
-    .demand(['k'])
+    .demand(['k', 'i'])
     .alias('k', 'keyRange')
     .describe('k', 'Key Range')
+    .alias('i', 'iterations')
+    .describe('i', 'Iterations')
     .argv;
 
-// NOTE: Setup Store
-var Store = require('./dynamoDB');
+var iteration = 0,
+    maxIteration = argv.iterations;
 
+var totalLatency = 0,
+    latency = 0,
+    startTime = Date.now();
+
+// NOTE: Prepare Keys
+KeyProvider.init(argv.keyRange, argv.iterations);
+
+// NOTE: Initialize Test
 Store.init().then(function (status) {
   if (status) {
     doTest(constants.TEST_PUT);
-    doTest(constants.TEST_GET);
-    doTest(constants.TEST_DELETE);
   } else {
     console.log("ERROR INITIALIZING DB !");
   }
 }, function (err) {
   console.log(err);
 });
-
-var iteration = 0;
-var totalLatency = 0;
-var keyRange = argv.keyRange;
-var maxIteration = 10;
-var startTime = Date.now();
-var latency = 0;
 
 function doTest(operation) {
     switch (operation) {
@@ -46,68 +49,96 @@ function doTest(operation) {
             testDelete();
             break;
         default:
-            logServerMessage("ERROR PERFORMING TEST: SOMETHING WENT TERRIBLY WRONG !");
+            logMessage("ERROR PERFORMING TEST: SOMETHING WENT TERRIBLY WRONG !");
     }
 }
 
-function testPut() {
-    latency = Date.now() - startTime;
-    totalLatency += latency;
-    
+function testPut(value) {
+    if (value) {
+      latency = Date.now() - startTime;
+      
+      logMessage(latency);
+      totalLatency += latency;
+    } else
+      startTime = Date.now();
+  
     if (iteration < maxIteration) {
-        performOperation(constants.TEST_PUT, keyRange.toString(), keyRange.toString() + '_value', testPut);
-        keyRange++; iteration++;
+        var key = KeyProvider.getKey(true);
+        performOperation(constants.TEST_PUT, key, key + '_value', testPut);
+        iteration++;
     } else {
         console.log("Total Put Latency / Lookup (ms) : ", totalLatency / maxIteration);
         Store.getSize().then(function (size) {
-          console.log("Size : ", size);
+          console.log("Size after Put : ", size);
+          
+          iteration = 0;
+          totalLatency = 0;
+          latency = 0;
+          
+          // NOTE: Prepare Keys
+          KeyProvider.init(argv.keyRange, argv.iterations);
+          
+          doTest(constants.TEST_GET);
         });
-
-        iteration = 0;
-        totalLatency = 0;
-        keyRange = argv.keyRange;
-        
-        doTest(constants.TEST_GET);
     }
 }
 
-function testGet() {
-    latency = Date.now() - startTime;
-    totalLatency += latency;
+function testGet(value) {
+    if (value) {
+      latency = Date.now() - startTime;
+      
+      logMessage(latency);
+      totalLatency += latency;
+    } else
+      startTime = Date.now();
   
     if (iteration < maxIteration) {
-        performOperation(constants.TEST_GET, keyRange.toString(), keyRange.toString() + '_value', testGet);
-        keyRange++; iteration++;
+        var key = KeyProvider.getKey(true);
+        performOperation(constants.TEST_GET, key, key + '_value', testGet);
+        iteration++;
     } else {
         console.log("Total Get Latency / Lookup (ms) : ", totalLatency / maxIteration);
         Store.getSize().then(function (size) {
-          console.log("Size : ", size);
+          console.log("Size after Get : ", size);
+          
+          iteration = 0;
+          totalLatency = 0;
+          latency = 0;
+          
+          // NOTE: Prepare Keys
+          KeyProvider.init(argv.keyRange, argv.iterations);
+          
+          doTest(constants.TEST_DELETE);
         });
-
-        iteration = 0;
-        totalLatency = 0;
-        keyRange = argv.keyRange;
-        
-        doTest(constants.TEST_DELETE);
     }
 }
 
-function testDelete() {
-    latency = Date.now() - startTime;
-    totalLatency += latency;
+function testDelete(value) {
+    if (value) {
+      latency = Date.now() - startTime;
+      
+      logMessage(latency);
+      totalLatency += latency;
+    } else
+      startTime = Date.now();
     
     if (iteration < maxIteration) {
-        performOperation(constants.TEST_DELETE, keyRange.toString(), keyRange.toString() + '_value', testDelete);
-        keyRange++; iteration++;
+        var key = KeyProvider.getKey(true);
+        performOperation(constants.TEST_DELETE, key, key + '_value', testDelete);
+        iteration++;
     } else {
         console.log("Total Delete Latency / Lookup (ms) : ", totalLatency / maxIteration);
         Store.getSize().then(function (size) {
-          console.log("Size : ", size);
+          console.log("Size after Delete: ", size);
+          
+          // NOTE: teardown
+          Store.teadDown();
+          process.exit();
         });
 
         iteration = 0;
         totalLatency = 0;
-        keyRange = argv.keyRange;
+        latency = 0;
     }
 }
 
@@ -127,18 +158,12 @@ function performOperation(operation, key, value, callback) {
             break;
         default:
             callback(null);
-            logServerMessage("ERROR: SOMETHING WENT TERRIBLY WRONG !");
+            logMessage("ERROR: SOMETHING WENT TERRIBLY WRONG !");
     }
 }
 
 // NOTE: log client message
-function logClientMessage(message) {
-    if (log)
+function logMessage(message) {
+    if (logEnabled)
         console.log("[Client] : ", message);
-}
-
-// NOTE: log server message
-function logServerMessage(message) {
-    if (log)
-        console.log("[Server] : ", message);
 }

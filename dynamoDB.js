@@ -54,6 +54,9 @@ function putValue(key, value, callback) {
     var params = {
         Item: { /* required */
             'key': {
+              "S" : key.toString()
+            },
+            'value': {
               "S" : value.toString()
             }
         },
@@ -67,8 +70,11 @@ function putValue(key, value, callback) {
     };
     
     DynamoDB.putItem(params, function (err, data) {
-        if (err) { console.log(err); deferred.reject("putItem() : " + err + err.stack); }
-        else deferred.resolve(data);
+        if (err) {
+          console.log("Put:", err);
+          deferred.reject(false);
+        } else
+          deferred.resolve(true);
     });
 
     return deferred.promise.nodeify(callback);
@@ -80,14 +86,22 @@ function getValue(key, callback) {
 
     var params = {
         Key: { /* required */
-            key: key
+            'key': {
+              "S" : key.toString()
+            }
         },
-        TableName: TABLE_NAME
+        TableName: TABLE_NAME,
+        AttributesToGet: [
+          'value'
+        ],
     };
 
     DynamoDB.getItem(params, function (err, data) {
-        if (err) deferred.reject("getItem() : " + err + err.stack);
-        else deferred.resolve(data);
+      if (err) {
+        console.log("Get:", err);
+        deferred.reject(false);
+      } else
+        deferred.resolve(true);
     });
 
     return deferred.promise.nodeify(callback);
@@ -99,14 +113,19 @@ function deleteKey(key, callback) {
 
     var params = {
         Key: { /* required */
-            key: key
+            'key': {
+              "S" : key.toString()
+            }
         },
         TableName: TABLE_NAME
     };
 
     DynamoDB.deleteItem(params, function (err, data) {
-        if (err) deferred.reject("deleteItem() : " + err + err.stack);
-        else deferred.resolve(data);
+      if (err) {
+        console.log("Delete:", err);
+        deferred.reject(false);
+      } else
+        deferred.resolve(true);
     });
 
     return deferred.promise.nodeify(callback);
