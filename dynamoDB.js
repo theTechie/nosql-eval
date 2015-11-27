@@ -5,7 +5,15 @@ var DynamoDB = new helper.AWS.DynamoDB(),
     TABLE_NAME = 'CS550';
 
 function init(callback) {
-  return createTable(callback);
+  var deferred = Q.defer();
+  
+  createTable().then(function (status) {
+    deferred.resolve(status);
+  }, function(status) {
+    deferred.reject(status);
+  });
+  
+  return deferred.promise.nodeify(callback);
 }
 
 // NOTE: create table
