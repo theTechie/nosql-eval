@@ -31,6 +31,8 @@ var iteration = 0;
 var totalLatency = 0;
 var keyRange = argv.keyRange;
 var maxIteration = 10;
+var startTime = Date.now();
+var latency = 0;
 
 function doTest(operation) {
     switch (operation) {
@@ -49,12 +51,15 @@ function doTest(operation) {
 }
 
 function testPut() {
+    latency = Date.now() - startTime;
+    totalLatency += latency;
+    
     if (iteration < maxIteration) {
         performOperation(constants.TEST_PUT, keyRange.toString(), keyRange.toString() + '_value', testPut);
         keyRange++; iteration++;
     } else {
         console.log("Total Put Latency / Lookup (ms) : ", totalLatency / maxIteration);
-        Store.getSize(function (size) {
+        Store.getSize().then(function (size) {
           console.log("Size : ", size);
         });
 
@@ -67,12 +72,15 @@ function testPut() {
 }
 
 function testGet() {
+    latency = Date.now() - startTime;
+    totalLatency += latency;
+  
     if (iteration < maxIteration) {
         performOperation(constants.TEST_GET, keyRange.toString(), keyRange.toString() + '_value', testGet);
         keyRange++; iteration++;
     } else {
         console.log("Total Get Latency / Lookup (ms) : ", totalLatency / maxIteration);
-        Store.getSize(function (size) {
+        Store.getSize().then(function (size) {
           console.log("Size : ", size);
         });
 
@@ -85,12 +93,15 @@ function testGet() {
 }
 
 function testDelete() {
+    latency = Date.now() - startTime;
+    totalLatency += latency;
+    
     if (iteration < maxIteration) {
         performOperation(constants.TEST_DELETE, keyRange.toString(), keyRange.toString() + '_value', testDelete);
         keyRange++; iteration++;
     } else {
         console.log("Total Delete Latency / Lookup (ms) : ", totalLatency / maxIteration);
-        Store.getSize(function (size) {
+        Store.getSize().then(function (size) {
           console.log("Size : ", size);
         });
 
@@ -102,6 +113,8 @@ function testDelete() {
 
 // NOTE: perform specific operation based on 'operation' using the 'key' and 'value'
 function performOperation(operation, key, value, callback) {
+    startTime = Date.now();
+    
     switch (operation) {
         case constants.TEST_PUT:
             Store.putValue(key, value).then(callback);
