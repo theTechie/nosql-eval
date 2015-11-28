@@ -11,6 +11,8 @@ var argv = require('optimist')
     .demand(['d', 'k', 'i'])
     .alias('d', 'dbName')
     .describe('d', 'NoSQL DB Name')
+    .alias('h', 'host')
+    .describe('h', 'Host IP Address')
     .alias('k', 'keyRange')
     .describe('k', 'Key Range')
     .alias('i', 'iterations')
@@ -44,14 +46,16 @@ switch (argv.dbName) {
 
 
 // NOTE: Initialize Test
-Store.init().then(function (status) {
+Store.init(argv.host).then(function (status) {
   if (status) {
     doTest(constants.TEST_PUT);
   } else {
     console.log("ERROR INITIALIZING DB !");
+    process.exit();
   }
 }, function (err) {
   console.log(err);
+  process.exit();
 });
 
 function doTest(operation) {

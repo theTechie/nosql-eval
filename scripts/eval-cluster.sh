@@ -23,7 +23,7 @@ GET_IP="aws ec2 describe-instances --query "Reservations[*].Instances[*].Private
 
 IP_LIST=$($GET_IP)
 
-#<script> <db> <scale>
+#<script> <db> <scale> <iterations>
 
 # Start Evaluation; output output in console and also store in  'output' folder with hostnames
 for (( i=0; i < $2; i++ ))

@@ -1,11 +1,13 @@
 var Q = require('q'),
     redis = require('redis'),
-    url = 'redis://172.17.0.2:6379',
+    uri = 'redis://',
+    port = '6379',
     TABLE_NAME = 'CS550',
     RedisClient;
 
-function init(callback) {
+function init(ip, callback) {
   var deferred = Q.defer();
+  var url = uri + ip + ':' + port;
   
   RedisClient = redis.createClient(url);
   

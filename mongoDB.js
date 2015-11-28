@@ -1,11 +1,14 @@
 var Q = require('q'),
     MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://172.17.0.2:27017/nosql-eval',
+    uri = 'mongodb://',
+    port = '27017',
+    db_name = 'nosql-eval',
     TABLE_NAME = 'CS550',
     db_obj;
 
-function init(callback) {
+function init(ip, callback) {
   var deferred = Q.defer();
+  var url = uri + ip + ':' + port + '/' + db_name;
   
   MongoClient.connect(url, function(err, db) {
     if (err) {
