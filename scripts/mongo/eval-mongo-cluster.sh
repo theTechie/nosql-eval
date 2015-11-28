@@ -26,7 +26,7 @@ IP_LIST=$($GET_IP)
 # Start Evaluation; output output in console and also store in  'output' folder with hostnames
 for (( i=0; i < $1; i++ ))
 do
-	RANGE = $(($(($i+1))*100000));
+	RANGE=$(($(($i+1))*100000));
 	echo "connect to ${IP_LIST[$i]} and start mongo evaluation"
 				parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "node nosql-eval/test_all -d mongo -k $RANGE -i 100000"
 done
