@@ -33,7 +33,7 @@ echo "neighbor.conf generated !"
 # Copy ZHT binary and configs to remote node $HOME
 for i in $IP_LIST; do
 	echo "connect to $i and copy configs"
-	 			parallel-scp -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" $HOST_FILE_LOCATION $REMOTE_FILE_LOCATION
+	parallel-scp -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" $HOST_FILE_LOCATION $REMOTE_FILE_LOCATION
 done
 
 # Start ZHT server at remote node
