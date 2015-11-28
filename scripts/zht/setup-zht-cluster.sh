@@ -45,5 +45,5 @@ done
 # Start Evaluation; output output in console and also store in  'output' folder with hostnames
 for i in $IP_LIST; do
 	echo "connect to $i and start zht evaluation"
-        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i --outdir output "./zht-eval/start-eval.sh"
+        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "./zht-eval/start-eval.sh"
 done
