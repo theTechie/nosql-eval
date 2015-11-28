@@ -33,17 +33,17 @@ echo "neighbor.conf generated !"
 # Copy ZHT binary and configs to remote node $HOME
 for i in $IP_LIST; do
 	echo "connect to $i and copy configs"
-	 parallel-scp -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" $HOST_FILE_LOCATION $REMOTE_FILE_LOCATION
+	 			parallel-scp -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" $HOST_FILE_LOCATION $REMOTE_FILE_LOCATION
 done
 
 # Start ZHT server at remote node
 for i in $IP_LIST; do
 	echo "connect to $i and start zhtserver"
-        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./start-server.sh > log.out 2> log.err < /dev/null &"
+        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./zht-eval/start-server.sh > server-log.out 2> server-log.err < /dev/null &"
 done
 
 # Start Evaluation
 for i in $IP_LIST; do
 	echo "connect to $i and start zht evaluation"
-        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./start-eval.sh > log.out 2> log.err < /dev/null &"
+        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./zht-eval/start-eval.sh > eval-log.out 2> eval-log.err < /dev/null &"
 done
