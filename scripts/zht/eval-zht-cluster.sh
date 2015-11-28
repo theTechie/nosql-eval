@@ -29,15 +29,9 @@ done) | tee confs/neighbor.conf
 
 echo "neighbor.conf generated !"
 
-# TODO : Use the parallel option -p  for faster copying. How to arrive at the parallelization number ?
-# Copy ZHT binary and configs to remote node $HOME
-for i in $IP_LIST; do
-	echo "connect to $i and copy configs"
-	parallel-scp -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" $HOST_FILE_LOCATION $REMOTE_FILE_LOCATION
-done
-
-# Start ZHT server at remote node
-for i in $IP_LIST; do
-	echo "connect to $i and start zhtserver"
-        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./zht-eval/start-server.sh > server-log.out 2> server-log.err < /dev/null &"
+# Start Evaluation; output output in console and also store in  'output' folder with hostnames
+for (( i=0; i < $1; i++ ))
+do
+	echo "connect to ${IP_LIST[$i]} and start zht evaluation"
+        parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "./zht-eval/start-eval.sh"
 done
