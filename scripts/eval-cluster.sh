@@ -30,5 +30,5 @@ for (( i=0; i < $2; i++ ))
 do
 	RANGE = $(($(($i+1))*100000));
 	echo "connect to ${IP_LIST[$i]} and start mongo evaluation"
-				parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "node test_all -d $1 -k $RANGE -i 100000"
+				parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "node nosql-eval/test_all -d $1 -k $RANGE -i 100000"
 done
