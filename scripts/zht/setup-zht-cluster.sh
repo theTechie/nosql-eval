@@ -42,8 +42,8 @@ for i in $IP_LIST; do
         parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./zht-eval/start-server.sh > server-log.out 2> server-log.err < /dev/null &"
 done
 
-# Start Evaluation
+# Start Evaluation; output output in console and also store in  'output' folder with hostnames
 for i in $IP_LIST; do
 	echo "connect to $i and start zht evaluation"
-        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" "nohup ./zht-eval/start-eval.sh > eval-log.out 2> eval-log.err < /dev/null &"
+        parallel-ssh -H $i -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i --outdir output "./zht-eval/start-eval.sh"
 done
