@@ -7,7 +7,7 @@ function init(startRange, numOfKeys) {
   
   for (var i = startRange; i < endRange; i++) {
     KVP.push({
-      key : makeString(keyLength),
+      key : i + makeString(keyLength),
       value: makeString(valueLength)
     });
   }
