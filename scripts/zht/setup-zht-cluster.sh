@@ -13,12 +13,13 @@ echo "Fetching Cluster IPs from AWS..."
 
 AMI_ID="ami-a0afbcc1"		# AMI used for cluster node
 INSTANCE_STATE_CODE="16"	# 0 (pending), 16 (running), 32 (shutting-down), 48 (terminated), 64 (stopping), 80 (stopped)
-PRIVATE_KEY="CS550.pem"		# ssh private-key file
+PRIVATE_KEY="$HOME/CS550.pem"		# ssh private-key file
 HOST_FILE_LOCATION="confs/*"	# location of the files to be copied to remote node
 REMOTE_FILE_LOCATION="$HOME/zht-eval"	# target location on remote node
 ZHT_SERVER_PORT=50000		# port on which ZHT Server will run
+TAG="cs550-cluster-node" # tag assigned to cluster nodes
 
-GET_IP="aws ec2 describe-instances --query "Reservations[*].Instances[*].PrivateIpAddress" --filter Name=instance-state-code,Values=$INSTANCE_STATE_CODE Name=image-id,Values=$AMI_ID  --output=text"
+GET_IP="aws ec2 describe-instances --query "Reservations[*].Instances[*].PrivateIpAddress" --filter Name=instance-state-code,Values=$INSTANCE_STATE_CODE Name=image-id,Values=$AMI_ID Name=tag-value,Values=$TAG --output=text"
 
 IP_LIST=$($GET_IP)
 
