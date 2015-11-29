@@ -4,7 +4,7 @@ var helper = require('./helper'),
 var DynamoDB = new helper.AWS.DynamoDB(),
     TABLE_NAME = 'CS550';
 
-function init(callback) {
+function init(ip, callback) {
   var deferred = Q.defer();
   
   createTable().then(function (status) {

@@ -29,6 +29,6 @@ IP_LIST=$($GET_IP)
 for (( i=0; i<$3; i++ ))
 do
 	RANGE=$(($(($i+1))*$4));
-	echo "connect to ${IP_LIST[$i]} and start mongo evaluation"
+	echo "connect to ${IP_LIST[$i]} and start $1 evaluation"
 				parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "node nosql-eval/test_all -d $1 -h $2 -k $RANGE -i $4"
 done

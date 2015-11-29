@@ -44,7 +44,6 @@ switch (argv.dbName) {
     process.exit();
 }
 
-
 // NOTE: Initialize Test
 Store.init(argv.host).then(function (status) {
   if (status) {
