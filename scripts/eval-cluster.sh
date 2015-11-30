@@ -11,7 +11,7 @@ echo "Fetching Cluster IPs from AWS..."
 #  - copy zht+ binary and configs using pSSH
 #  - start zht+ server on all cluster nodes using pSSH
 
-AMI_ID="ami-50706231"		# AMI used for cluster node
+AMI_ID="ami-xxxxxx"		# AMI used for cluster node
 INSTANCE_STATE_CODE="16"	# 0 (pending), 16 (running), 32 (shutting-down), 48 (terminated), 64 (stopping), 80 (stopped)
 PRIVATE_KEY="$HOME/CS550.pem"		# ssh private-key file
 HOST_FILE_LOCATION="confs/*"	# location of the files to be copied to remote node
@@ -23,12 +23,9 @@ GET_IP="aws ec2 describe-instances --query "Reservations[*].Instances[*].Private
 
 IP_LIST=$($GET_IP)
 
-# <script> <db> <ip> <scale> <iterations>
+# <script> <db> <ip> <iterations>
 
 # Start Evaluation; output output in console and also store in  'output' folder with hostnames
-for (( i=0; i<$3; i++ ))
-do
-	RANGE=$(($(($i+1))*$4));
-	echo "connect to ${IP_LIST[$i]} and start $1 evaluation"
-				parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "node nosql-eval/test_all -d $1 -h $2 -k $RANGE -i $4"
-done
+RANGE=10000;
+echo "connect to peers and start $1 evaluation"
+parallel-ssh -h hosts.txt -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -t -1 -i -o output -e error "node nosql-eval/test_all -d $1 -h $2 -k $RANGE -i $3"

@@ -23,9 +23,11 @@ GET_IP="aws ec2 describe-instances --query "Reservations[*].Instances[*].Private
 
 IP_LIST=$($GET_IP)
 
+# <script> <scale> <iterations>
+
 # Start Evaluation; output output in console and also store in  'output' folder with hostnames
-for (( i=0; i < $1; i++ ))
+for (( i=0; i <$1; i++ ))
 do
 	echo "connect to ${IP_LIST[$i]} and start zht evaluation"
-        parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "./zht-eval/start-eval.sh"
+        parallel-ssh -H ${IP_LIST[$i]} -x "-oStrictHostKeyChecking=no -i $PRIVATE_KEY" -i -o output -e error "./zht-eval/start-eval.sh $2"
 done
